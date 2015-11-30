@@ -1,0 +1,3 @@
+[submodule "SharpIR"]
+	path = SharpIR
+	url = https://github.com/wreevehicks/SharpIR.git
