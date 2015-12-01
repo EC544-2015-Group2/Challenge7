@@ -34,7 +34,9 @@ A1 - IR2
 // Semi automatic system mode to allow manual control of WiFi module
 SYSTEM_MODE(SEMI_AUTOMATIC)
 
-
+/*
+ * 			SHARP IR SENSOR
+ */
 #include "SharpIR.h"
 #define IR_MODEL 20150
 #define IR_SAMPLING_PERIOD 50
@@ -47,6 +49,11 @@ void cb_ir() {
 Timer timer_ir(IR_SAMPLING_PERIOD, cb_ir);
 
 
+
+
+/*
+ * 			HR04 ULTRASONIC SENSOR
+ */
 #define US_SAMPLING_PERIOD 40
 #define US_MAX_DELAY 18000
 const uint8_t PIN_US_ECHO[] = {D4, D5, D6, D7};
@@ -88,10 +95,65 @@ void us3_isr(){
 Timer timer_us(US_SAMPLING_PERIOD, cb_us);
 
 
+
+
+/*
+ * 			LIDARLITE SENSOR
+ */
+#define LIDARLITE_ADDR 0x62
+#define LIDARLITE_CMD_CTRL_ADDR 0x00
+#define LIDARLITE_TRIG_VAL 0x04
+#define LIDARLITE_RANGE_ADDR 0x8f
+#define LIDAR_SAMPLING_PERIOD 5
 const uint8_t PIN_LIDAR_EN[2] = {D2, D3};
 volatile uint16_t lidar_distance[2];
+void cb_lidar(){
+	static uint8_t enabled_lidar;
+	static uint8_t lidar_state;		 // {0:Disabled, 1:Enabled, 2:Triggered, 3:Requested data}
+	static uint8_t state_cycle_count;
+
+	switch (lidar_state) {
+    case 0:
+      for (int i = 0; i < 2; i++) digitalWrite(PIN_LIDAR_EN[i], LOW);
+      digitalWrite(PIN_LIDAR_EN[enabled_lidar], HIGH);
+      lidar_state = 1;
+      state_cycle_count = 0;
+      break;
+    case 1:
+      Wire.beginTransmission(LIDARLITE_ADDR);
+      Wire.write(LIDARLITE_CMD_CTRL_ADDR);
+      Wire.write(LIDARLITE_TRIG_VAL);
+      if (Wire.endTransmission() == 0) lidar_state = 2;
+      else state_cycle_count++;
+      break;
+    case 2:
+      Wire.beginTransmission(LIDARLITE_ADDR);
+      Wire.write(LIDARLITE_RANGE_ADDR);
+      if (Wire.endTransmission() == 0) lidar_state = 3;
+      else state_cycle_count++;
+      break;
+    case 3:
+      if (Wire.requestFrom(LIDARLITE_ADDR, 2) >= 2) {
+        uint16_t val = Wire.read() << 8 | Wire.read();
+        if (val < 500 && val > 10) lidar_distance[enabled_lidar] = 0.2 * lidar_distance[enabled_lidar] + 0.8 * val;
+
+        enabled_lidar = 1 - enabled_lidar;
+        lidar_state = 0;
+      } else state_cycle_count++;
+  }
+  if (state_cycle_count > 30) {
+    lidar_state = 0;
+    enabled_lidar = 1 - enabled_lidar;
+  }
+}
+Timer timer_lidar(LIDAR_SAMPLING_PERIOD, cb_lidar);
 
 
+
+
+/*
+ * 			SHARP IR SENSOR
+ */
 const uint8_t PIN_MOTOR = A4;
 const uint8_t PIN_SERVO = A5;
 
@@ -99,6 +161,7 @@ const uint8_t PIN_SERVO = A5;
 
 void setup(){
 	initIOPins();
+		
 	timer_ir.start();
 
 	attachInterrupt(PIN_US_ECHO[0], us0_isr, CHANGE);
@@ -106,6 +169,10 @@ void setup(){
 	attachInterrupt(PIN_US_ECHO[2], us2_isr, CHANGE);
 	attachInterrupt(PIN_US_ECHO[3], us3_isr, CHANGE);
 	timer_us.start();
+
+	Wire.begin();
+	timer_lidar.start();
+
 }
 
 void loop() {
