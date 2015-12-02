@@ -32,7 +32,7 @@ A1 - IR2
 */
 
 // Semi automatic system mode to allow manual control of WiFi module
-SYSTEM_MODE(SEMI_AUTOMATIC)
+SYSTEM_MODE(SEMI_AUTOMATIC);
 
 /*
  * 			SHARP IR SENSOR
@@ -42,11 +42,16 @@ SYSTEM_MODE(SEMI_AUTOMATIC)
 #define IR_SAMPLING_PERIOD 50
 const uint8_t PIN_IR[] = {A0, A1};
 volatile uint16_t ir_distance[2];
-void cb_ir() {
-	static SharpIR sharp_ir[] = {SharpIR(PIN_IR[0], IR_MODEL), SharpIR(PIN_IR[1], IR_MODEL)};
-	for(int i=0; i<2; i++) ir_distance[i] = sharp_ir[i].distance();
-}
+SharpIR sharp_ir[] = {SharpIR(PIN_IR[0], IR_MODEL), SharpIR(PIN_IR[1], IR_MODEL)};
 Timer timer_ir(IR_SAMPLING_PERIOD, cb_ir);
+void init_ir(){
+	for(int i=0; i<2; i++)	pinMode(PIN_IR[i], INPUT);
+	timer_ir.start();
+}
+void cb_ir() {
+	for(int i=0; i<2; i++) ir_distance[i] = sharp_ir[i].distance();
+	// Serial.print(ir_distance[0]);	Serial.print("\t");		Serial.println(ir_distance[1]);
+}
 
 
 
@@ -61,6 +66,18 @@ const uint8_t PIN_US_TRIG[] = {A2, A3, DAC, WKP};
 volatile uint16_t us_distance[4];
 volatile uint32_t us_start_time[4];
 volatile uint32_t us_end_time[4];
+Timer timer_us(US_SAMPLING_PERIOD, cb_us);
+void init_us(){
+	for(int i=0; i<4; i++){
+		pinMode(PIN_US_TRIG[i], OUTPUT);
+		pinMode(PIN_US_ECHO[i], INPUT);
+	}
+	attachInterrupt(PIN_US_ECHO[0], us0_isr, CHANGE);
+	attachInterrupt(PIN_US_ECHO[1], us1_isr, CHANGE);
+	attachInterrupt(PIN_US_ECHO[2], us2_isr, CHANGE);
+	attachInterrupt(PIN_US_ECHO[3], us3_isr, CHANGE);
+	timer_us.start();
+}
 void cb_us(){
 	for(int i=0; i<4; i++)
 		if(us_end_time[i] > us_start_time[i])		// Takes care of micros() timer overflow every 35 seconds
@@ -92,7 +109,7 @@ void us3_isr(){
 	if(pinReadFast(PIN_US_ECHO[3])) 	us_start_time[3] = micros();
 	else	us_end_time[3] = micros();
 }
-Timer timer_us(US_SAMPLING_PERIOD, cb_us);
+
 
 
 
@@ -107,11 +124,15 @@ Timer timer_us(US_SAMPLING_PERIOD, cb_us);
 #define LIDAR_SAMPLING_PERIOD 5
 const uint8_t PIN_LIDAR_EN[2] = {D2, D3};
 volatile uint16_t lidar_distance[2];
+uint8_t enabled_lidar = 0;
+uint8_t lidar_state = 0;		 // {0:Disabled, 1:Enabled, 2:Triggered, 3:Requested data}
+uint8_t state_cycle_count = 0;
+Timer timer_lidar(LIDAR_SAMPLING_PERIOD, cb_lidar);
+void init_lidar(){
+	for(int i=0; i<2; i++)	pinMode(PIN_LIDAR_EN[i], OUTPUT);
+	timer_lidar.start();
+}
 void cb_lidar(){
-	static uint8_t enabled_lidar;
-	static uint8_t lidar_state;		 // {0:Disabled, 1:Enabled, 2:Triggered, 3:Requested data}
-	static uint8_t state_cycle_count;
-
 	switch (lidar_state) {
     case 0:
       for (int i = 0; i < 2; i++) digitalWrite(PIN_LIDAR_EN[i], LOW);
@@ -146,46 +167,39 @@ void cb_lidar(){
     enabled_lidar = 1 - enabled_lidar;
   }
 }
-Timer timer_lidar(LIDAR_SAMPLING_PERIOD, cb_lidar);
+
 
 
 
 
 /*
- * 			SHARP IR SENSOR
+ * 			CONTROLLER
  */
+#define CONTROLLER_OUTPUT_PERIOD 40
 const uint8_t PIN_MOTOR = A4;
 const uint8_t PIN_SERVO = A5;
+Timer timer_controller(CONTROLLER_OUTPUT_PERIOD, cb_controller);
+void init_controller(){
+	pinMode(PIN_MOTOR, OUTPUT);
+	pinMode(PIN_SERVO, OUTPUT);
+	timer_controller.start();
+}
+void cb_controller(){
+
+}
 
 
 
-void setup(){
-	initIOPins();
-		
-	timer_ir.start();
 
-	attachInterrupt(PIN_US_ECHO[0], us0_isr, CHANGE);
-	attachInterrupt(PIN_US_ECHO[1], us1_isr, CHANGE);
-	attachInterrupt(PIN_US_ECHO[2], us2_isr, CHANGE);
-	attachInterrupt(PIN_US_ECHO[3], us3_isr, CHANGE);
-	timer_us.start();
-
+ void setup(){
+	WiFi.off();
 	Wire.begin();
-	timer_lidar.start();
-
+	Serial.begin(57600);
+	// init_ir();
+	// init_lidar();
+	// init_us();
+	// init_controller();
 }
 
 void loop() {
-
-}
-
-void initIOPins(){
-	for(int i=0; i<2; i++)	pinMode(PIN_IR[i], INPUT);
-	for(int i=0; i<2; i++)	pinMode(PIN_LIDAR_EN[i], OUTPUT);
-	for(int i=0; i<4; i++){
-		pinMode(PIN_US_TRIG[i], OUTPUT);
-		pinMode(PIN_US_ECHO[i], INPUT);
-	}
-	pinMode(PIN_MOTOR, OUTPUT);
-	pinMode(PIN_SERVO, OUTPUT);
 }
