@@ -43,7 +43,7 @@ void setup() {
 	initLEDPINS();
 	sendCommand(0x00000000, (uint8_t*)&MSG_ALIVE, 1);
 	us_ping(); 
-	for(i=0, i<2, i++){
+	for(int i=0; i<2; i++){
 		us_initDistance[i] = us_distance[i];
 	}
 }
@@ -53,7 +53,7 @@ void loop() {
 }
 
 void us_ping(void){
-	for (i=0, i<2, i++){
+	for (int i=0; i<2; i++){
 		digitalWrite(us_trig[i], LOW);
 		delayMicroseconds(2); 
 		digitalWrite(us_trig[i], HIGH);
@@ -92,7 +92,7 @@ void initLEDPINS(void) {
 }
 
 void initUS(void) {
-	for(i=0, i<2, i++) {
+	for(int i=0; i<2; i++) {
 		pinMode(us_trig[i], OUTPUT);
 		pinMode(us_echo[i], INPUT);
 		digitalWrite(us_echo[i], HIGH);
@@ -100,17 +100,17 @@ void initUS(void) {
 }
 
 void evalPing(void) {
-	for (i=0, i<2, i++) {
+	for (int i=0; i<2; i++) {
 		if (us_distance[i] < 0.75 * us_initDistance[i]) {
 			count[i]++;
 			if (count[i] == 3) {
 				trip[i] = true;
 				switch (i) {
 					case 1:
-					sendCommand(0x00000000, &MSG_TRIP1, 1);
+					sendCommand(0x00000000, (uint8_t*)&MSG_TRIP1, 1);
 					break;
 					case 2:
-					sendCommand(0x00000000, &MSG_TRIP2, 1);
+					sendCommand(0x00000000, (uint8_t*)&MSG_TRIP2, 1);
 					break;	
 				}
 				prevState[i] = trip[i];
@@ -121,10 +121,10 @@ void evalPing(void) {
 			if (trip[i] != prevState[i]) {
 				switch(i) {
 					case 1:
-					sendCommand(0x00000000, &MSG_UNTRIP1, 1);
+					sendCommand(0x00000000, (uint8_t*)&MSG_UNTRIP1, 1);
 					break;
 					case 2:
-					sendCommand(0x00000000, &MSG_UNTRIP2, 1);
+					sendCommand(0x00000000, (uint8_t*)&MSG_UNTRIP2, 1);
 					break;	
 				}
 			}
