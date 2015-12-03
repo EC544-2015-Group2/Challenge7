@@ -4,4 +4,4 @@ Adafruit_BNO055/*.cpp
 Adafruit_BNO055/*.h
 Adafruit_BNO055/utility/*.h
 Adafruit_Sensor/*.h
-SensorCode_Photon.ino
+main.ino
