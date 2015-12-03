@@ -31,8 +31,8 @@ ZBTxRequest txRequest;
 int us_initDistance[2];
 int us_distance[2];
 
-const int us_trig[] = {D4, D5};
-const int us_echo[] = {D6, D7};
+const int us_trig[] = {4, 5};
+const int us_echo[] = {6, 7};
 
 void setup() {
 	Serial.begin(57600);
