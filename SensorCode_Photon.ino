@@ -57,7 +57,7 @@ void cb_ir() {
 
 
 /*
- * 			HR04 ULTRASONIC SENSOR
+ * 			HC SR04 ULTRASONIC SENSOR
  */
 #define US_SAMPLING_PERIOD 40
 #define US_MAX_DELAY 18000
@@ -115,7 +115,7 @@ void us3_isr(){
 
 
 /*
- * 			LIDARLITE SENSOR
+ * 			LIDARLITE v1 SENSOR
  */
 #define LIDARLITE_ADDR 0x62
 #define LIDARLITE_CMD_CTRL_ADDR 0x00
@@ -171,6 +171,32 @@ void cb_lidar(){
 
 
 
+/*
+ * 			BNO055 9DOF IMU
+ */
+#include "Adafruit_BNO055.h"
+#include "imumaths.h"
+#define IMU_SAMPLING_PERIOD 40
+Adafruit_BNO055 bno = Adafruit_BNO055();
+Timer timer_imu(IMU_SAMPLING_PERIOD, cb_imu);
+imu::Vector<3> euler;
+void init_imu(){
+	if(!bno.begin()){
+		/* There was a problem detecting the BNO055 ... check your connections */
+		Serial.println("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
+		while(1);
+	}
+	delay(1000);
+	bno.setExtCrystalUse(true);
+	timer_imu.start();
+}
+void cb_imu(){
+	euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+}
+
+
+
+
 
 /*
  * 			CONTROLLER
@@ -191,15 +217,15 @@ void cb_controller(){
 
 
 
- void setup(){
+void setup(){
 	WiFi.off();
 	Wire.begin();
 	Serial.begin(57600);
+	// init_imu();
 	// init_ir();
 	// init_lidar();
 	// init_us();
 	// init_controller();
 }
 
-void loop() {
-}
+void loop() {}
