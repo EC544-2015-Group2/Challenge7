@@ -1,0 +1,9 @@
+[submodule "Photon/SharpIR"]
+	path = Photon/SharpIR
+	url = https://github.com/ghirlekar/SharpIR.git
+[submodule "Photon/Adafruit_Sensor"]
+	path = Photon/Adafruit_Sensor
+	url = https://github.com/ghirlekar/Adafruit_Sensor.git
+[submodule "Photon/Adafruit_BNO055"]
+	path = Photon/Adafruit_BNO055
+	url = https://github.com/ghirlekar/Adafruit_BNO055.git
