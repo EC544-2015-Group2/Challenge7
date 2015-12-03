@@ -105,6 +105,8 @@ void evalPing(void) {
 			count[i]++;
 			if (count[i] == 3) {
 				trip[i] = true;
+				digitalWrite(PIN_LED_TRIP, HIGH);
+				digitalWrite(PIN_LED_UNTRIP, LOW);
 				switch (i) {
 					case 1:
 					sendCommand(0x00000000, (uint8_t*)&MSG_TRIP1, 1);
@@ -117,6 +119,8 @@ void evalPing(void) {
 			} 
 		} else {
 			trip[i] = false;
+			digitalWrite(PIN_LED_TRIP, LOW);
+			digitalWrite(PIN_LED_UNTRIP, HIGH);
 			count[i] = 0;
 			if (trip[i] != prevState[i]) {
 				switch(i) {
