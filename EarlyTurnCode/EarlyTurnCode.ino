@@ -12,12 +12,10 @@ Servo wheels; // servo for turning the wheels
 Servo esc; // not actually a servo, but controlled like one!
 int pos = 90;
 int speed = 90;
-int count = 0;
-int triggerCount = 0;
 bool trigger = false;
 bool complete = false;
 bool threePointStart = false;
-int forwardTime = 1000;
+int forwardTime = 2000;
 int backwardTime = 600;
 int pauseTime = 500;
 int servoMoveTime = 600;
@@ -48,39 +46,26 @@ void loop() {
     esc.write(60);
     readAndHandlePackets();
     if (trigger && millis() - timeStamp > 5000) {
-      Serial.println("Activate 3-point turn");
-      threePointStart = true;
-      left_forward();
-      pause_vehicle();
-      right_backward();
-      pause_vehicle();
+      Serial.println("Activate early turn");
+      while (!complete) {
+        left_forward();
+        delay(20);
+      }
       straight_forward();
       pause_vehicle();
       timeStamp = millis();
-      trigger = false;
       singleAttempt = false;
     }
   } else esc.write(90);
   if (complete) {
-    Serial.println("3-point turn completed");
+    Serial.println("Turn complete");
     complete = false;
   }
 }
 
-
-
 void left_forward(void) {
   wheels.write(130);
-  delay(forwardTime);
-}
-
-void right_backward(void) {
-  wheels.write(50);
-  delay(servoMoveTime);
-  for (speed = 90; speed < 120; speed++) {
-    esc.write(speed);
-  }
-  delay(backwardTime);
+  esc.write(60);
 }
 
 void pause_vehicle(void) {
@@ -115,24 +100,19 @@ void readAndHandlePackets(void) {
     serialLog(rxResponse.getData(0));
     switch (rxResponse.getData(0)) {
       case MSG_TRIP1:
-        //
-        break;
-      case MSG_UNTRIP1:
         trigger = true;
         complete = false;
         Serial.println(trigger);
         break;
+      case MSG_UNTRIP1:
+        //
+        break;
       case MSG_TRIP2:
-        triggerCount++;
+        complete = true;
         break;
       case MSG_UNTRIP2:
-        Serial.println(triggerCount);
-        Serial.println(threePointStart);
-        if (triggerCount > 1 && threePointStart == true) {
-          complete = true;
-          threePointStart = false;
-          triggerCount = 0;
-        }
+        //
+        
         break;
 
     }

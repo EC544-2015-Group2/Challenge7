@@ -2,6 +2,8 @@
 #include <XBee.h>
 #include <SoftwareSerial.h>
 
+#define MESSAGE_DELAY_PERIOD  5000 // may take this out in favor of turned repot
+
 const uint8_t MSG_ALIVE = 0xB0,
               MSG_TRIP1 = 0xB1,
               MSG_UNTRIP1 = 0xB2,
@@ -44,10 +46,10 @@ void setup() {
 }
 
 void loop() {
-  if (singleAttempt) {
+  if (singleAttempt = true) {
     esc.write(60);
     readAndHandlePackets();
-    if (trigger && millis() - timeStamp > 5000) {
+    if (trigger) {
       Serial.println("Activate 3-point turn");
       threePointStart = true;
       left_forward();
@@ -60,10 +62,10 @@ void loop() {
       trigger = false;
       singleAttempt = false;
     }
-  } else esc.write(90);
-  if (complete) {
-    Serial.println("3-point turn completed");
-    complete = false;
+    if (complete) {
+      Serial.println("3-point turn completed");
+      complete = false;
+    }
   }
 }
 
@@ -126,8 +128,8 @@ void readAndHandlePackets(void) {
         triggerCount++;
         break;
       case MSG_UNTRIP2:
-        Serial.println(triggerCount);
-        Serial.println(threePointStart);
+      Serial.println(triggerCount);
+      Serial.println(threePointStart);
         if (triggerCount > 1 && threePointStart == true) {
           complete = true;
           threePointStart = false;
@@ -138,3 +140,4 @@ void readAndHandlePackets(void) {
     }
   }
 }
+
