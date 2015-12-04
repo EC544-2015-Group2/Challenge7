@@ -18,6 +18,7 @@ int count = 0;
 int triggerCount = 0;
 bool trigger = false;
 bool complete = false;
+bool threePointStart = false;
 int forwardTime = 1000;
 int backwardTime = 600;
 int pauseTime = 500;
@@ -46,6 +47,8 @@ void setup() {
 void loop() {
   readAndHandlePackets();
   if (trigger && millis() - timeStamp > 5000) {
+    Serial.println("Activate 3-point turn");
+    threePointStart = true;
     left_forward();
     pause_vehicle();
     right_backward();
@@ -53,9 +56,15 @@ void loop() {
     straight_forward();
     pause_vehicle();
     timeStamp = millis();
+    trigger = false;
   }
-  if (trigger && millis() - timeStamp < 5000) trigger = false;
+  if (complete) {
+    Serial.println("3-point turn completed");
+    complete = false;
+  }
 }
+
+
 
 void left_forward(void) {
   wheels.write(130);
@@ -91,12 +100,7 @@ void straight_forward(void) {
   delay(straightTime);
 }
 
-void serialLog(bool in, uint32_t address64, uint8_t payload) {
-  if (in)  Serial.print("MSG_IN");
-  else Serial.print("                                       MSG_OUT");
-  Serial.print(":");
-  Serial.print(address64, HEX);
-  Serial.print(":");
+void serialLog(uint8_t payload) {
   switch (payload) {
     case MSG_ALIVE: Serial.println("ALIVE"); break;
     case MSG_TRIP1: Serial.println("TRIP1"); break;
@@ -109,20 +113,26 @@ void serialLog(bool in, uint32_t address64, uint8_t payload) {
 void readAndHandlePackets(void) {
   if (xbee.readPacket(1) && xbee.getResponse().getApiId() == ZB_RX_RESPONSE) {
     xbee.getResponse().getZBRxResponse(rxResponse);
+    serialLog(rxResponse.getData(0));
     switch (rxResponse.getData(0)) {
       case MSG_TRIP1:
         trigger = true;
         complete = false;
+        Serial.println(trigger);
         break;
       case MSG_UNTRIP1:
-        trigger = false;
+//        trigger = false;
         break;
       case MSG_TRIP2:
         triggerCount++;
         break;
       case MSG_UNTRIP2:
-        if (triggerCount > 1) {
+      Serial.println(triggerCount);
+      Serial.println(threePointStart);
+        if (triggerCount > 1 && threePointStart == true) {
           complete = true;
+          threePointStart = false;
+          triggerCount = 0;
         }
         break;
 
