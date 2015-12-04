@@ -9,7 +9,7 @@ A1 - IR2
 #define INC_IR_H_
 
 #include "Particle.h"
-#include "SharpIR/SharpIR.h"
+#include "lib/SharpIR/SharpIR.h"
 #define IR_MODEL 20150
 #define IR_SAMPLING_PERIOD 50
 

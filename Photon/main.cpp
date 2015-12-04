@@ -31,14 +31,14 @@ A0 - IR1
 A1 - IR2
 */
 
-// Semi automatic system mode to allow manual control of WiFi module
 #include "Particle.h"
-#include "ir/ir.h"
-#include "us/us.h"
-#include "lidar/lidar.h"
-#include "imu/imu.h"
-#include "controller/controller.h"
+#include "inc/ir.h"
+#include "inc/us.h"
+#include "inc/lidar.h"
+#include "inc/imu.h"
+#include "inc/controller.h"
 
+// Semi automatic system mode to allow manual control of WiFi module
 SYSTEM_MODE(SEMI_AUTOMATIC);
 
 void setup(){

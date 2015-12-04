@@ -1,5 +1,5 @@
 #include "Particle.h"
-#include "imu.h"
+#include "inc/imu.h"
 
 Adafruit_BNO055 bno = Adafruit_BNO055();
 Timer timer_imu(IMU_SAMPLING_PERIOD, cb_imu);

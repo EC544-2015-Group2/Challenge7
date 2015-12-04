@@ -1,5 +1,5 @@
 #include "Particle.h"
-#include "controller.h"
+#include "inc/controller.h"
 
 const uint8_t PIN_MOTOR = A4;
 const uint8_t PIN_SERVO = A5;

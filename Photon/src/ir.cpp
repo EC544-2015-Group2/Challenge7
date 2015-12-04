@@ -5,7 +5,7 @@ A1 - IR2
 */
 
 #include "Particle.h"
-#include "ir.h"
+#include "inc/ir.h"
 
 const uint8_t PIN_IR[] = {A0, A1};
 volatile uint16_t ir_distance[] = {0, 0};

@@ -8,7 +8,7 @@ D3 - LIDAR2 ENABLE
 
 
 #include "Particle.h"
-#include "lidar.h"
+#include "inc/lidar.h"
 
 const uint8_t PIN_LIDAR_EN[] = {D2, D3};
 volatile uint16_t lidar_distance[] = {0, 0};

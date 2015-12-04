@@ -8,7 +8,7 @@ D7 - uS3 echo
 
 
 #include "Particle.h"
-#include "us.h"
+#include "inc/us.h"
 
 const uint8_t PIN_US_ECHO[] = {D4, D5, D6, D7};
 const uint8_t PIN_US_TRIG[] = {A2, A3, DAC, WKP};
