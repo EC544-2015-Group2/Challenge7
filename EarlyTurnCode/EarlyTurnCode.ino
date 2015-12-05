@@ -7,8 +7,8 @@ const uint8_t MSG_TRIP1 = 0xB1,
               MSG_TRIP3 = 0xB3,
               MSG_TRIP4 = 0xB4;
 
-Servo wheels; 
-Servo esc; 
+Servo steeringServo; 
+Servo motorServo; 
 int pos = 90;
 int speed = 90;
 bool trigger[] = {true, false, false, false, false}; // first true is to allow first beacon to trip
@@ -29,10 +29,10 @@ ZBTxRequest txRequest;
 
 void setup() {
   delay(3000);
-  wheels.attach(8); // initialize wheel servo to Digital IO Pin #8
-  esc.attach(9); // initialize ESC to Digital IO Pin #9
-  wheels.write(pos);
-  esc.write(speed);
+  steeringServo.attach(9); // initialize wheel servo to Digital IO Pin #8
+  motorServo.attach(8); // initialize motorServo to Digital IO Pin #9
+  steeringServo.write(pos);
+  motorServo.write(speed);
 
   Serial.begin(57600);
   xbeeSerial.begin(57600);
@@ -42,7 +42,7 @@ void setup() {
 
 void loop() {
   if (singleAttempt) {
-    esc.write(60);
+    motorServo.write(60);
     readAndHandlePackets();
     if (trigger[count]) {
       Serial.println("Turn!");
@@ -58,16 +58,16 @@ void loop() {
 }
 
 void left_forward(void) {
-  wheels.write(150);
-  esc.write(60);
+  steeringServo.write(150);
+  motorServo.write(60);
   delay(forwardTime);
 }
 
 void pause_vehicle(void) {
-  esc.detach();
+  motorServo.detach();
   delay(pauseTime);
-  esc.attach(9);
-  esc.write(90);
+  motorServo.attach(9);
+  motorServo.write(90);
 }
 
 void readAndHandlePackets(void) {
