@@ -2,25 +2,24 @@
 #include <XBee.h>
 #include <SoftwareSerial.h>
 
-const uint8_t MSG_ALIVE = 0xB0,
-              MSG_TRIP1 = 0xB1,
-              MSG_UNTRIP1 = 0xB2,
-              MSG_TRIP2 = 0xB3,
-              MSG_UNTRIP2 = 0xB4;
+const uint8_t MSG_TRIP1 = 0xB1,
+              MSG_TRIP2 = 0xB2,
+              MSG_TRIP3 = 0xB3,
+              MSG_TRIP4 = 0xB4;
 
-Servo wheels; // servo for turning the wheels
-Servo esc; // not actually a servo, but controlled like one!
+Servo wheels; 
+Servo esc; 
 int pos = 90;
 int speed = 90;
-bool trigger = false;
+bool trigger[] = {true, false, false, false, false}; // first true is to allow first beacon to trip
 bool complete = false;
-bool threePointStart = false;
 int forwardTime = 2000;
-int backwardTime = 600;
 int pauseTime = 500;
 int servoMoveTime = 600;
-int straightTime = 1500;
 int timeStamp = millis();
+int count = 0;
+
+// delete singleAttempt in final 
 bool singleAttempt = true;
 
 XBee xbee = XBee();
@@ -45,27 +44,19 @@ void loop() {
   if (singleAttempt) {
     esc.write(60);
     readAndHandlePackets();
-    if (trigger && millis() - timeStamp > 5000) {
-      Serial.println("Activate early turn");
-      while (!complete) {
-        left_forward();
-        delay(20);
-      }
-      straight_forward();
-      pause_vehicle();
+    if (trigger[count]) {
+      Serial.println("Turn!");
+      left_forward();
       timeStamp = millis();
       singleAttempt = false;
     }
-  } else esc.write(90);
-  if (complete) {
-    Serial.println("Turn complete");
-    complete = false;
-  }
+  } else pause_vehicle();
 }
 
 void left_forward(void) {
   wheels.write(130);
   esc.write(60);
+  delay(forwardTime);
 }
 
 void pause_vehicle(void) {
@@ -75,44 +66,38 @@ void pause_vehicle(void) {
   esc.write(90);
 }
 
-void straight_forward(void) {
-  wheels.write(90);
-  delay(servoMoveTime);
-  for (speed = 90; speed > 60; speed--) {
-    esc.write(speed);
-  }
-  delay(straightTime);
-}
-
-void serialLog(uint8_t payload) {
-  switch (payload) {
-    case MSG_ALIVE: Serial.println("ALIVE"); break;
-    case MSG_TRIP1: Serial.println("TRIP1"); break;
-    case MSG_TRIP2: Serial.println("TRIP2"); break;
-    case MSG_UNTRIP1: Serial.println("UNTRIP1");  break;
-    case MSG_UNTRIP2: Serial.println("UNTRIP2");  break;
-  }
-}
-
-void readAndHandlePackets(void) {
+int readAndHandlePackets() {
   if (xbee.readPacket(1) && xbee.getResponse().getApiId() == ZB_RX_RESPONSE) {
     xbee.getResponse().getZBRxResponse(rxResponse);
-    serialLog(rxResponse.getData(0));
     switch (rxResponse.getData(0)) {
       case MSG_TRIP1:
-        trigger = true;
-        complete = false;
-        Serial.println(trigger);
-        break;
-      case MSG_UNTRIP1:
-        //
+        if (trigger [0], !trigger[1], !trigger[2], !trigger[3], !trigger[4]) {
+          trigger[1] = true;
+          Serial.println("TRIP1");
+          count++;
+        } 
         break;
       case MSG_TRIP2:
-        complete = true;
+        if (trigger [0], trigger[1], !trigger[2], !trigger[3], !trigger[4]) {
+          trigger[2] = true;
+          Serial.println("TRIP2");
+          count++;
+        }
         break;
-      case MSG_UNTRIP2:
-        //
-        
+      case MSG_TRIP3:
+        if (trigger [0], trigger[1], trigger[2], !trigger[3], !trigger[4]) {
+          trigger[3] = true;
+          Serial.println("TRIP3");
+          count++;
+        }
+        break;
+      case MSG_TRIP4:
+        if (trigger [0], trigger[1], trigger[2], trigger[3], !trigger[4]) {
+          trigger[4] = true;
+          Serial.println("TRIP4");
+          complete = true;
+          count++;
+        }
         break;
 
     }
