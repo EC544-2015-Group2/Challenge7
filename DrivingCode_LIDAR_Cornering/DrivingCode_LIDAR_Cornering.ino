@@ -133,7 +133,7 @@ void loop() {
   if (!state_paused) {
     now = millis();
     read_lidars();
-    if (now - led_timeout > 2000) digitalWrite(PIN_LED_MESSAGE_RECEIVED, LOW);
+    if (now - led_timeout > 1000) digitalWrite(PIN_LED_MESSAGE_RECEIVED, LOW);
     readAndHandlePackets();
     if (now - timestamp > 40) {
       if (trigger[count]) {
