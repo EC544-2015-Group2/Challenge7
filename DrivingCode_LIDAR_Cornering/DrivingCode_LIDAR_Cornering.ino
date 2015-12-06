@@ -22,7 +22,7 @@ const uint8_t MSG_TRIP1 = 0xB1,
               MSG_TRIP3 = 0xB3,
               MSG_TRIP4 = 0xB4;
 
-const int PIN_LED_MESSAGE_RECEIVED = 2;
+const int PIN_LED_MESSAGE_RECEIVED = 10;
 unsigned long led_timeout = millis();
 
 const int lidar_pwr_en[] = {
@@ -79,6 +79,10 @@ ZBTxRequest txRequest;
 //---------------------------------------------------------//
 void setup() {
   delay(3000);
+
+  pinMode(PIN_LED_MESSAGE_RECEIVED, OUTPUT);
+  digitalWrite(PIN_LED_MESSAGE_RECEIVED, LOW);
+
   PID_theta.SetMode(AUTOMATIC);
   PID_dist.SetMode(AUTOMATIC);
 //  PID_speed.SetMode(AUTOMATIC);
