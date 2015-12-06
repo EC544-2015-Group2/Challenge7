@@ -59,7 +59,7 @@ const int steeringPin = 9, motorPin = 8;
 double Setpoint_theta = 0, Input_theta, Output_theta, Setpoint_dist = 90, Input_dist, Output_dist, Setpoint_speed = 60, Input_speed, Output_speed;
 //specify initial PID links and tuning
 int KpT = 1.3, KiT = 0, KdT = 0.01;  // {1.7, 0, 0.01}
-int KpD = 1.2, KiD = 0.075, KdD = 0.97;   // {1, 0, 0}
+int KpD = 1.2, KiD = 0.02, KdD = 1.05;//0.97   // {1, 0, 0}
 //int KpS = 0.5, KiS = 0, KdS = 0;
 PID PID_theta(&Input_theta, &Output_theta, &Setpoint_theta, KpT, KiT, KdT, DIRECT);
 PID PID_dist(&Input_dist, &Output_dist, &Setpoint_dist, KpD, KiD, KdD, DIRECT);
@@ -147,7 +147,7 @@ void loop() {
     read_lidars();
     if (now - led_timeout > 1000) digitalWrite(PIN_LED_MESSAGE_RECEIVED, LOW);
     readAndHandlePackets();
-    if (now - timestamp > 40) {
+    if (now - timestamp > 20) {
       if (trigger[count]) {
         Serial.println("Turn!");
         left_forward();
@@ -185,12 +185,15 @@ void loop() {
 
 //---------------------------------------------------------//
 void us_obstacle_avoidance(void) {
+  us_avg_distance = 0;
   us_averaged_distance();
   while (us_avg_distance < 50 && us_avg_distance != 0) {
-    motorServo.detach();
+    motorServo.write(90);
+//    motorServo.detach();
+    delay(1000);
     us_averaged_distance();
   }
-  motorServo.attach(8);
+//  motorServo.attach(8);
 }
 
 void us_ping(void) {
@@ -200,13 +203,11 @@ void us_ping(void) {
   delayMicroseconds(5);
   digitalWrite(us_trig, LOW);
   delayMicroseconds(2);
-  us_distance = (pulseIn(us_echo, HIGH, 18000)) / 58;
+  us_distance = (pulseIn(us_echo, HIGH, 6000)) / 58;
   Serial.println(us_distance);
-  delay(20);
 }
 
 void us_averaged_distance(void) {
-  us_avg_distance = 0;
   for (int i = 0; i < 1; i++) {
     us_ping();
     us_avg_distance = us_avg_distance + us_distance;
@@ -216,10 +217,10 @@ void us_averaged_distance(void) {
 
 void left_forward(void) {
   steeringServo.write(150);
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 100; i++) {
     motorServo.write(60);
+    delay(forwardTime / 100);
     us_obstacle_avoidance();
-    delay(forwardTime / 10);
   }
 }
 
