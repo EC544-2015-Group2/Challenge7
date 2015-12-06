@@ -14,8 +14,7 @@
 #define LIDARLITE_TRIG_VAL 0x04
 #define LIDARLITE_RANGE_ADDR 0x8f
 
-// timestamps
-unsigned long now, timestamp;
+
 
 const uint8_t MSG_TRIP1 = 0xB1,
               MSG_TRIP2 = 0xB2,
@@ -28,10 +27,16 @@ unsigned long led_timeout = millis();
 const int lidar_pwr_en[] = {
   12, 13
 };    // PWR_EN pins to put lidars to sleep
+const int us_trig = 4;
+const int us_echo = 5;
+
 int enabled_lidar = 0;
 int lidar_state = 0;    // {0:Disabled, 1:Enabled, 2:Triggered, 3:Requested data}
 int state_cycle_count = 0;
 double dist[2];
+
+// timestamps
+unsigned long now, timestamp;
 
 int pos = 90;
 int speed = 90;
@@ -42,6 +47,9 @@ int pauseTime = 500;
 int servoMoveTime = 600;
 unsigned long timeStamp = millis();
 int count = 1;
+int us_avg_distance = 0;
+int us_distance = 0;
+
 
 //set up servos
 Servo steeringServo, motorServo;
@@ -80,6 +88,9 @@ ZBTxRequest txRequest;
 void setup() {
   delay(3000);
 
+  pinMode(us_trig, OUTPUT);
+  pinMode(us_echo, INPUT);
+  digitalWrite(us_echo, HIGH);
   pinMode(PIN_LED_MESSAGE_RECEIVED, OUTPUT);
   digitalWrite(PIN_LED_MESSAGE_RECEIVED, LOW);
 
@@ -131,6 +142,7 @@ void loop() {
   //   if (state_paused)  motorServo.write(90);
   // }
   if (!state_paused) {
+    us_obstacle_avoidance();
     now = millis();
     read_lidars();
     if (now - led_timeout > 1000) digitalWrite(PIN_LED_MESSAGE_RECEIVED, LOW);
@@ -172,17 +184,43 @@ void loop() {
 
 
 //---------------------------------------------------------//
-void left_forward(void) {
-  steeringServo.write(150);
-  motorServo.write(60);
-  delay(forwardTime);
+void us_obstacle_avoidance(void) {
+  us_averaged_distance();
+  while (us_avg_distance < 50 && us_avg_distance != 0) {
+    motorServo.detach();
+    us_averaged_distance();
+  }
+  motorServo.attach(8);
 }
 
-void pause_vehicle(void) {
-  motorServo.detach();
-  delay(pauseTime);
-  motorServo.attach(9);
-  motorServo.write(90);
+void us_ping(void) {
+  digitalWrite(us_trig, LOW);
+  delayMicroseconds(2);
+  digitalWrite(us_trig, HIGH);
+  delayMicroseconds(5);
+  digitalWrite(us_trig, LOW);
+  delayMicroseconds(2);
+  us_distance = (pulseIn(us_echo, HIGH, 18000)) / 58;
+  Serial.println(us_distance);
+  delay(20);
+}
+
+void us_averaged_distance(void) {
+  us_avg_distance = 0;
+  for (int i = 0; i < 1; i++) {
+    us_ping();
+    us_avg_distance = us_avg_distance + us_distance;
+  }
+  us_avg_distance = us_avg_distance / 1;
+}
+
+void left_forward(void) {
+  steeringServo.write(150);
+  for (int i = 0; i < 10; i++) {
+    motorServo.write(60);
+    us_obstacle_avoidance();
+    delay(forwardTime / 10);
+  }
 }
 
 double calcAngle(double dist0, double dist1) {
