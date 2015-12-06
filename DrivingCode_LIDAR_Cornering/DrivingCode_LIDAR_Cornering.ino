@@ -142,7 +142,7 @@ void loop() {
   //   if (state_paused)  motorServo.write(90);
   // }
   if (!state_paused) {
-    us_obstacle_avoidance();
+    // us_obstacle_avoidance();
     now = millis();
     read_lidars();
     if (now - led_timeout > 1000) digitalWrite(PIN_LED_MESSAGE_RECEIVED, LOW);
@@ -220,7 +220,7 @@ void left_forward(void) {
   for (int i = 0; i < 100; i++) {
     motorServo.write(60);
     delay(forwardTime / 100);
-    us_obstacle_avoidance();
+    // us_obstacle_avoidance();
   }
 }
 
