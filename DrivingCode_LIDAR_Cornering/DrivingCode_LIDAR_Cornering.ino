@@ -22,6 +22,9 @@ const uint8_t MSG_TRIP1 = 0xB1,
               MSG_TRIP3 = 0xB3,
               MSG_TRIP4 = 0xB4;
 
+const int PIN_LED_MESSAGE_RECEIVED = 2;
+unsigned long led_timeout = millis();
+
 const int lidar_pwr_en[] = {
   12, 13
 };    // PWR_EN pins to put lidars to sleep
@@ -126,6 +129,7 @@ void loop() {
   if (!state_paused) {
     now = millis();
     read_lidars();
+    if (now - led_timeout > 2000) digitalWrite(PIN_LED_MESSAGE_RECEIVED, LOW);
     readAndHandlePackets();
     if (now - timestamp > 40) {
       if (trigger[count]) {
@@ -133,6 +137,7 @@ void loop() {
         left_forward();
         timeStamp = millis();
         count++;
+        digitalWrite(PIN_LED_MESSAGE_RECEIVED, LOW);
       }
 //      wheel_rpm = ENCODER_SCALING * encoder_count / (now - timestamp);
 //      Input_speed = wheel_rpm;
@@ -234,6 +239,8 @@ void readAndHandlePackets(void) {
   if (xbee.readPacket(1) && xbee.getResponse().getApiId() == ZB_RX_RESPONSE) {
     xbee.getResponse().getZBRxResponse(rxResponse);
     Serial.print("Got a packet!");
+    digitalWrite(PIN_LED_MESSAGE_RECEIVED, HIGH);
+    led_timeout = millis();
     switch (rxResponse.getData(0)) {
       case MSG_TRIP1:
         if (trigger [0], !trigger[1], !trigger[2], !trigger[3], !trigger[4]) {
