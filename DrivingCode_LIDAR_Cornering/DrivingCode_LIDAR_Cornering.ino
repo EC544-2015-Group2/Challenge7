@@ -51,7 +51,7 @@ void loop() {
 void readAndHandlePackets() {
   if (xbee.readPacket(1) && xbee.getResponse().getApiId() == ZB_RX_RESPONSE) {
     xbee.getResponse().getZBRxResponse(rxResponse);
-//    Serial.print("Got a packet!");
+    Serial.print("Got a packet!");
     digitalWrite(PIN_LED_MSG, HIGH);
     led_timeout = millis();
     if (rxResponse.getData(0) == trigger) {
@@ -62,12 +62,12 @@ void readAndHandlePackets() {
           motorServo.write(90);
           delay(40);
         }
-        motorServo.write(65);
+        motorServo.write(60);
         steeringServo.write(150);
         delay(200);
       }
-//      Serial.print("Triggered: 0x");
-//      Serial.println(trigger, HEX);
+      Serial.print("Triggered: 0x");
+      Serial.println(trigger, HEX);
     }
   }
 }

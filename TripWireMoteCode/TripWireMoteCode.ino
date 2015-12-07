@@ -66,6 +66,7 @@ uint16_t us_ping(void) {
 
 void sendCommand() {
   txRequest = ZBTxRequest(XBeeAddress64(0x00000000, 0x00000000), (uint8_t*)&MSG_TRIP, 1);
+  txRequest.setOption(0x01); // Disable retries and route repair
   xbee.send(txRequest);
   Serial.println("                TRIP MESSAGE SENT");   
 }
