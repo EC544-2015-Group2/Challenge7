@@ -80,7 +80,7 @@ double wheel_rpm;
 bool state_paused = false;
 
 XBee xbee = XBee();
-SoftwareSerial xbeeSerial(2, 3);
+SoftwareSerial xbeeSerial(6, 7);
 ZBRxResponse rxResponse = ZBRxResponse();
 ZBTxRequest txRequest;
 
