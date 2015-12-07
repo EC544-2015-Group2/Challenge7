@@ -76,6 +76,7 @@ const int encoder_pin = 2;
 volatile int encoder_count = 0;
 double wheel_rpm;
 #define ENCODER_SCALING 833.33 // Convert from pulses/ms to rpm 60000/72
+// NOTE: CIRCUMFERENCE IS 0.625m
 
 bool state_paused = false;
 
