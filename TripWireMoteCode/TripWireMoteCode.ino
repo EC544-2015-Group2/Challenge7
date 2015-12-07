@@ -1,4 +1,5 @@
 /* MOTE CODE TO CREATE TRIP WIRES
+ *  MAKE SURE TO CHANGE THE MSG_TRIP BYTE 0xB1 is mote 1, 0xB2 is mote to and so on
 
 */
 #include <XBee.h>
@@ -20,7 +21,7 @@ bool trip = false;
 bool prevState = trip;
 
 // SET UP XBEE
-const uint8_t MSG_TRIP = 0xB1;
+const uint8_t MSG_TRIP = 0xB3;
 
 XBee xbee = XBee();
 SoftwareSerial xbeeSerial(2, 3);
@@ -91,7 +92,7 @@ void evalPing(void) {
       trip = true;
       digitalWrite(PIN_LED_TRIP, HIGH);
       sendCommand(0x00000000, (uint8_t*)&MSG_TRIP, 1);
-      delay(20);
+      delay(2000);
       prevState = trip;
       timeStamp = millis();
       Serial.print("timestamp: ");
