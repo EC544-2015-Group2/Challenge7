@@ -72,10 +72,10 @@ double LIDARspacing = 22.5;
 const float pi = 3.142;
 
 // Wheel encoder pulse counter variable
-//const int encoder_pin = 2;
-//volatile int encoder_count = 0;
-//double wheel_rpm;
-//#define ENCODER_SCALING 833.33 // Convert from pulses/ms to rpm 60000/72
+const int encoder_pin = 2;
+volatile int encoder_count = 0;
+double wheel_rpm;
+#define ENCODER_SCALING 833.33 // Convert from pulses/ms to rpm 60000/72
 
 bool state_paused = false;
 
@@ -117,9 +117,9 @@ void setup() {
   delay(100);
 
   // Set encoder pin as input and enable internal pull-up resistor
-//  pinMode(encoder_pin, INPUT);
+ pinMode(encoder_pin, INPUT);
 //  digitalWrite(encoder_pin, HIGH);
-//  attachInterrupt(digitalPinToInterrupt(encoder_pin), encoder_ISR, CHANGE);
+ attachInterrupt(digitalPinToInterrupt(encoder_pin), encoder_ISR, CHANGE);
 
   // Set up the lidar pins and change the lidar acquisition count register value
   for (int i = 0; i < 2; i++)   pinMode(lidar_pwr_en[i], OUTPUT);
@@ -148,6 +148,9 @@ void loop() {
     if (now - led_timeout > 1000) digitalWrite(PIN_LED_MESSAGE_RECEIVED, LOW);
     readAndHandlePackets();
     if (now - timestamp > 20) {
+      wheel_rpm = ENCODER_SCALING * encoder_count / (now - timestamp);
+      Input_speed = wheel_rpm;
+      encoder_count = 0;
       if (trigger[count]) {
         Serial.println("Turn!");
         left_forward();
@@ -155,9 +158,7 @@ void loop() {
         count++;
         digitalWrite(PIN_LED_MESSAGE_RECEIVED, LOW);
       }
-//      wheel_rpm = ENCODER_SCALING * encoder_count / (now - timestamp);
-//      Input_speed = wheel_rpm;
-//      encoder_count = 0;
+
       timestamp = now;
       //    dist[0] = 4.5 + dist[0] * (0.98); //scaling equation
       Input_theta = calcAngle(dist[0], dist[1]);
@@ -184,6 +185,10 @@ void loop() {
 
 
 //---------------------------------------------------------//
+void encoder_ISR() {
+  encoder_count++;
+}
+
 void us_obstacle_avoidance(void) {
   us_avg_distance = 0;
   us_averaged_distance();
@@ -231,11 +236,6 @@ double calcAngle(double dist0, double dist1) {
 double calcPerpDist(double dist0, double dist1, double angle) {
   return ((dist0 + dist1) * cos(angle)) / 2;
 }
-
-//void encoder_ISR() {
-//  encoder_count++;
-//}
-
 
 void read_lidars() {
   //  Serial.print(lidar_state);
