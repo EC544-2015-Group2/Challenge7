@@ -34,6 +34,12 @@ void setup() {
   init_encoder();
   init_controller();
   init_us();
+
+  while (!xbee.readPacket(1) && xbee.getResponse().getApiId() != ZB_RX_RESPONSE) {};
+  xbee.getResponse().getZBRxResponse(rxResponse);
+  trigger = rxResponse.getData(0) + 1;
+  Serial.print("Initialized: 0x");
+  Serial.println(trigger, HEX);
 }
 
 void loop() {
@@ -55,7 +61,10 @@ void readAndHandlePackets() {
     digitalWrite(PIN_LED_MSG, HIGH);
     led_timeout = millis();
     if (rxResponse.getData(0) == trigger) {
-      trigger++;
+      Serial.print("Triggered: 0x");
+      Serial.println(trigger, HEX);
+      if (trigger < XBEE_MSG_TRIP1 + 3) trigger++;
+      else trigger = XBEE_MSG_TRIP1;
       for (int i = 0; i < 10; i++) {
         while (us_dist < 50) {
           ping_us();
@@ -66,8 +75,6 @@ void readAndHandlePackets() {
         steeringServo.write(150);
         delay(200);
       }
-      Serial.print("Triggered: 0x");
-      Serial.println(trigger, HEX);
     }
   }
 }
