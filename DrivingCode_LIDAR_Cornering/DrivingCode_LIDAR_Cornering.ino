@@ -9,6 +9,7 @@
 #include "encoder.h"
 #include "controller.h"
 #include "ultrasonic.h"
+#include "corner_detection.h"
 
 #define XBEE_MSG_TRIP1   0xB1
 #define PIN_LED_MSG 10
@@ -34,13 +35,14 @@ void setup() {
   init_encoder();
   init_controller();
   init_us();
+  init_cd();
 
   boolean initialized = false;
   while (!initialized) {
     if (xbee.readPacket(1) && xbee.getResponse().getApiId() == ZB_RX_RESPONSE) {
       xbee.getResponse().getZBRxResponse(rxResponse);
       Serial.println(rxResponse.getData(0));
-      switch(rxResponse.getData(0)){
+      switch (rxResponse.getData(0)) {
         case 0xB5:
           trigger = 0xB2;
           initialized = true;
@@ -87,15 +89,18 @@ void readAndHandlePackets() {
       Serial.println(trigger, HEX);
       if (trigger < XBEE_MSG_TRIP1 + 3) trigger++;
       else trigger = XBEE_MSG_TRIP1;
-      for (int i = 0; i < 10; i++) {
-        while (us_dist < 50) {
-          ping_us();
-          motorServo.write(90);
-          delay(40);
+      ping_cd();
+      if (ping_cd) {
+        for (int i = 0; i < 10; i++) {
+          while (us_dist < 50) {
+            ping_us();
+            motorServo.write(90);
+            delay(40);
+          }
+          motorServo.write(60);
+          steeringServo.write(150);
+          delay(200);
         }
-        motorServo.write(60);
-        steeringServo.write(150);
-        delay(200);
       }
     }
   }

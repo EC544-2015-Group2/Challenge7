@@ -15,6 +15,6 @@ extern uint16_t cd_timer;
 extern uint16_t cd_dist;
 
 void init_cd();
-uint16_t ping_cd();
+bool ping_cd();
 
 #endif
