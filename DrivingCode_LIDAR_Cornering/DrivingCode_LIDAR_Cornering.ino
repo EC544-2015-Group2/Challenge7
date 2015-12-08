@@ -14,7 +14,7 @@
 #define PIN_LED_MSG 10
 
 uint32_t led_timeout = millis();
-uint8_t trigger = XBEE_MSG_TRIP1;
+uint8_t trigger;
 
 XBee xbee = XBee();
 SoftwareSerial xbeeSerial(6, 7);
@@ -38,6 +38,7 @@ void setup() {
   while (!xbee.readPacket(1) && xbee.getResponse().getApiId() != ZB_RX_RESPONSE) {};
   xbee.getResponse().getZBRxResponse(rxResponse);
   trigger = rxResponse.getData(0) + 1;
+  if(trigger > XBEE_MSG_TRIP1 + 3)  trigger = XBEE_MSG_TRIP1;
   Serial.print("Initialized: 0x");
   Serial.println(trigger, HEX);
 }

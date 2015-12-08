@@ -27,7 +27,7 @@ void encoder_calculate_distance() {
     //    Serial.print("Distance: ");
     //    Serial.println(encoder_distance);
     //    Serial.print("Count: ");
-    Serial.println(encoder_count);
+//    Serial.println(encoder_count);
   }
 }
 
