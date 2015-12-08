@@ -48,7 +48,7 @@ void compute_controller() {
       PID_dist.Compute();
       PID_vel.Compute();
 
-      motorServo.write(70);
+      motorServo.write(63);
       steeringServo.write(90 + constrain(out_theta - out_dist, -45, 45));
     }
   }
