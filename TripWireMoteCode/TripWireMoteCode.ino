@@ -1,4 +1,5 @@
 /* MOTE CODE TO CREATE TRIP WIRES
+ *  MAKE SURE TO CHANGE THE MSG_TRIP BYTE 0xB1 is mote 1, 0xB2 is mote to and so on
 
 */
 #include <XBee.h>
@@ -14,7 +15,7 @@ uint8_t count = 0;
 uint32_t timeStamp = 0;
 
 // SET UP XBEE
-const uint8_t MSG_TRIP = 0xB1;
+const uint8_t MSG_TRIP = 0xB3;
 
 XBee xbee = XBee();
 SoftwareSerial xbeeSerial(2, 3);

@@ -10,7 +10,6 @@
 #include "controller.h"
 #include "ultrasonic.h"
 
-
 #define XBEE_MSG_TRIP1   0xB1
 #define PIN_LED_MSG 10
 
@@ -71,5 +70,3 @@ void readAndHandlePackets() {
     }
   }
 }
-
-
