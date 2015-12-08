@@ -10,6 +10,7 @@
 #define PIN_ENCODER_IN	2
 #define ENCODER_SCALING 833.33 // Convert from pulses/ms to rpm 60000/72
 #define PULSE_TO_DISTANCE
+#define PERIOD_ENCODER 1000
 
 extern volatile uint32_t encoder_count;
 extern uint32_t encoder_distance;

@@ -41,6 +41,7 @@ void loop() {
   compute_controller();
   ping_us();
   readAndHandlePackets();
+  encoder_calculate_distance();
   if (millis() - led_timeout > 1000) digitalWrite(PIN_LED_MSG, LOW);
   delay(1);
 }
