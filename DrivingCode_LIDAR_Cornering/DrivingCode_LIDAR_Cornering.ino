@@ -35,10 +35,31 @@ void setup() {
   init_controller();
   init_us();
 
-  while (!xbee.readPacket(1) && xbee.getResponse().getApiId() != ZB_RX_RESPONSE) {};
-  xbee.getResponse().getZBRxResponse(rxResponse);
-  trigger = rxResponse.getData(0) + 1;
-  if(trigger > XBEE_MSG_TRIP1 + 3)  trigger = XBEE_MSG_TRIP1;
+  boolean initialized = false;
+  while (!initialized) {
+    if (xbee.readPacket(1) && xbee.getResponse().getApiId() == ZB_RX_RESPONSE) {
+      xbee.getResponse().getZBRxResponse(rxResponse);
+      Serial.println(rxResponse.getData(0));
+      switch(rxResponse.getData(0)){
+        case 0xB5:
+          trigger = 0xB2;
+          initialized = true;
+          break;
+        case 0xB6:
+          trigger = 0xB3;
+          initialized = true;
+          break;
+        case 0xB7:
+          trigger = 0xB4;
+          initialized = true;
+          break;
+        case 0xB8:
+          trigger = 0xB1;
+          initialized = true;
+          break;
+      }
+    }
+  }
   Serial.print("Initialized: 0x");
   Serial.println(trigger, HEX);
 }
