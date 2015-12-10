@@ -16,7 +16,7 @@
 
 extern volatile boolean encoder_changed;
 extern uint32_t encoder_count;
-extern uint32_t encoder_distance;
+//extern uint32_t encoder_distance;
 extern uint32_t timer_encoder;
 extern uint32_t last_count;
 extern uint16_t corner1[2];
