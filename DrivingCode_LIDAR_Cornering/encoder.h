@@ -19,6 +19,12 @@ extern uint32_t encoder_count;
 extern uint32_t encoder_distance;
 extern uint32_t timer_encoder;
 extern uint32_t last_count;
+extern uint16_t corner1[2];
+extern uint16_t corner2[2];
+extern uint16_t corner3[2];
+extern uint16_t corner4[2];
+extern uint16_t location[2];
+extern uint16_t encoder_mapped_distance;
 
 void init_encoder();
 void read_encoder();
