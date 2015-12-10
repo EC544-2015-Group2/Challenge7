@@ -20,17 +20,10 @@
 <script src="js/tmStickUp.js"></script>
 <script src="js/jquery.ui.totop.js"></script>
 <script src="js/touchTouch.jquery.js"></script>
+<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.9.24/paper-full.js"></script>
 
-<script>
- $(document).ready(function(){
 
-  $().UItoTop({ easingType: 'easeOutQuart' });
-  $('#stuck_container').tmStickUp({});
-  $('.gallery .gall_item').touchTouch();
-
-  });
-</script>
 <!--[if lt IE 9]>
  <div style=' clear: both; text-align:center; position: relative;'>
    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
@@ -90,7 +83,7 @@
 		      <div class="gall_block">
             <h1>Camera</h1>
             <video id="camera" style="width: 440px;height: 420px;" autoplay></video>
-            <div id="btnGroup" style="position: relative; left: 200px">
+            <div id="btnGroup" style="position: relative; left: 230px">
                <div class="row">
                    <button id="btnUp" class="btn btn-default" style="position: relative; left: 50px" onclick="onControl(this.id)"><span class="glyphicon glyphicon-arrow-up"></span> </button>
                </div>
@@ -188,17 +181,13 @@
               </ul>
           </div>
       </div>
-
-
-
-
     </div>
   </div>
 </section>
 <!--==============================
               footer
 =================================-->
-<footer id="footer">
+<footer id="footer" style="background-color: #adacac !important; color: #e2e2e2 !important">
   <div class="container">
     <div class="row">
       <div class="grid_12">
@@ -214,8 +203,8 @@
     </div>
   </div>
 </footer>
-<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
-  <script>
+
+<script>
 var socket = io();
 function onControl(id) {
 socket.emit('control', function (data) {
@@ -284,6 +273,15 @@ var beaconPaths = beaconLocations.map(function(location) {
     });
 });
 }
+</script>
+<script>
+ $(document).ready(function(){
+
+  $().UItoTop({ easingType: 'easeOutQuart' });
+  $('#stuck_container').tmStickUp({});
+  $('.gallery .gall_item').touchTouch();
+
+  });
 </script>
 </body>
 </html>
