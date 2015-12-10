@@ -80,6 +80,7 @@ void loop() {
   ping_us();
   ping_cd();
   readAndHandlePackets();
+  turnCorner();
   encoder_debounce();
   encoder_logger();
   if (millis() - led_timeout > 1000) digitalWrite(PIN_LED_MSG, LOW);
