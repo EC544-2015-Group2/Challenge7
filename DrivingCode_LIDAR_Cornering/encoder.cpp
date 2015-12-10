@@ -19,11 +19,13 @@ void encoder_ISR() {
   encoder_changed = true;
 }
 
-void encoder_logger() {
+void encoder_logger(uint8_t trigger) {
   if (millis() > timer_encoder) {
     timer_encoder = millis() + PERIOD_ENCODER;
     //    encoder_distance = (encoder_count * 0.625);
-    Serial.println(encoder_count);
+    encoder_distance = 0.8 * encoder_count * 0.625 / 8;
+    Serial.write(trigger);
+    Serial.println(encoder_distance);
   }
 }
 

@@ -23,6 +23,6 @@ void init_encoder();
 void read_encoder();
 void encoder_ISR();
 void encoder_debounce();
-void encoder_logger();
+void encoder_logger(uint8_t);
 
 #endif
