@@ -52,7 +52,8 @@ void encoder_logger(uint8_t trigger) {
         location[1] = corner4[2];
         break;
     }
-    Serial.print(location[0]); Serial.print(", "); Serial.println(location[1]);
+    Serial.println(encoder_count);
+//    Serial.print(location[0]); Serial.print(", "); Serial.println(location[1]);
   }
 }
 

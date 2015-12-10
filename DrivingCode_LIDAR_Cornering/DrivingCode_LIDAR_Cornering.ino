@@ -49,7 +49,7 @@ void setup() {
   while (!initialized) {
     if (xbee.readPacket(1) && xbee.getResponse().getApiId() == ZB_RX_RESPONSE) {
       xbee.getResponse().getZBRxResponse(rxResponse);
-      Serial.println(rxResponse.getData(0));
+//      Serial.println(rxResponse.getData(0));
       switch (rxResponse.getData(0)) {
         case 0xB5:
           trigger = 0xB2;
@@ -92,13 +92,13 @@ void loop() {
 void readAndHandlePackets() {
   if (xbee.readPacket(1) && xbee.getResponse().getApiId() == ZB_RX_RESPONSE) {
     xbee.getResponse().getZBRxResponse(rxResponse);
-    Serial.print("Got a packet!");
+//    Serial.print("Got a packet!");
     digitalWrite(PIN_LED_MSG, HIGH);
     led_timeout = millis();
     if (rxResponse.getData(0) == trigger) {
       turn_flag = true;
-      Serial.print("Triggered: 0x");
-      Serial.println(trigger, HEX);
+//      Serial.print("Triggered: 0x");
+//      Serial.println(trigger, HEX);
       if (trigger < XBEE_MSG_TRIP1 + 3) trigger++;
       else trigger = XBEE_MSG_TRIP1;
     }

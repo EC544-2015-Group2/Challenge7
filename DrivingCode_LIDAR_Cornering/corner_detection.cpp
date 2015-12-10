@@ -22,7 +22,7 @@ void ping_cd() {
     if (val > max_dist) val = 0;
     if(val == 0) counter++;
     if (counter == 1) {
-      Serial.println(counter);
+//      Serial.println(counter);
       cd_flag = true;
       counter = 0;
     } else cd_flag = false;
