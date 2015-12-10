@@ -82,7 +82,7 @@ void loop() {
   readAndHandlePackets();
   turnCorner();
   encoder_debounce();
-  encoder_logger();
+  encoder_logger(trigger);
   if (millis() - led_timeout > 1000) digitalWrite(PIN_LED_MSG, LOW);
   delay(1);
 }
@@ -107,6 +107,7 @@ void readAndHandlePackets() {
 
 void turnCorner() {
   if (cd_flag && turn_flag) {
+    encoder_count = 0;
     Serial.println("CORNER_DETECTION: TURN");
     for (int i = 0; i < 10; i++) {
       while (us_dist < 50) {
