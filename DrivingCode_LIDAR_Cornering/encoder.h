@@ -12,6 +12,7 @@
 #define PULSE_TO_DISTANCE
 #define PERIOD_ENCODER 100
 #define PERIOD_ENCODER_DEBOUNCE 50
+#define SCALING_FACTOR    1
 
 extern volatile boolean encoder_changed;
 extern uint32_t encoder_count;
