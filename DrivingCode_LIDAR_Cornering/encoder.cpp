@@ -22,7 +22,7 @@ void encoder_ISR() {
 void encoder_logger() {
   if (millis() > timer_encoder) {
     timer_encoder = millis() + PERIOD_ENCODER;
-    //    encoder_distance = (encoder_count * 0.625);
+    encoder_distance = 0.8 * (encoder_count * 0.625) / 8;
     Serial.println(encoder_count);
   }
 }

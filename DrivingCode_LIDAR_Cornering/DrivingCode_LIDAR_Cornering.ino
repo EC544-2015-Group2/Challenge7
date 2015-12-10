@@ -95,6 +95,7 @@ void readAndHandlePackets() {
       Serial.println(trigger, HEX);
       if (trigger < XBEE_MSG_TRIP1 + 3) trigger++;
       else trigger = XBEE_MSG_TRIP1;
+      encoder_count = 0;
       for (int i = 0; i < 10; i++) {
         while (us_dist < 50) {
           ping_us();
